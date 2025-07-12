@@ -135,13 +135,11 @@
   <ItemGroup>
     <ClCompile Include="DoomsCall.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Screens.cpp" />
     <ClCompile Include="Settings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DoomsCall.h" />
-    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Screens.h" />
     <ClInclude Include="Settings.h" />
   </ItemGroup>

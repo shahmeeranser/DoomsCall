@@ -1,6 +1,25 @@
 #pragma once
 
-#include "Renderer.h"
+#include "DoomsCall.h"
+
+enum HUDType { SELECTED, UNSELECTED, FILLEDHP, EMPTYHP };
+
+class Renderer {
+    static std::vector<sf::IntRect> hudpart;
+    static std::vector<sf::IntRect> itemsrect;
+    static sf::Sprite hud;
+    static sf::Sprite items;
+    static std::vector<sf::IntRect> tilesrect;
+    static sf::Sprite tiles;
+    static sf::Sprite buttonsprite;
+    static sf::Sprite slidersprite;
+public:
+    Renderer();
+    static void RenderHUD(sf::RenderWindow& window, Player& player);
+    static void RenderMap(sf::RenderWindow& window, Player& player, Map& map);
+    static void RenderButton(sf::RenderWindow& window, Button& button);
+    static void RenderSlider(sf::RenderWindow& window, Slider& slider);
+};
 
 class Screen {
 public:
@@ -12,7 +31,6 @@ public:
     virtual bool isSeeThrough() = 0;
 };
 class MainScreen :public Screen {
-    ButtonRender buttonrender;
     sf::Sprite title;
     Button start;
     Button option;
@@ -27,7 +45,6 @@ public:
     bool isSeeThrough();
 };
 class SettingsScreen:public Screen {
-    ButtonRender buttonrender;
     Button display;
     Button sound;
     Button controls;
@@ -42,8 +59,6 @@ public:
     bool isSeeThrough();
 };
 class SoundSettingsScreen :public Screen {
-    SliderRender sliderrender;
-    ButtonRender buttonrender;
     Slider master;
     Slider effect;
     Slider music;
@@ -59,8 +74,6 @@ public:
     bool isSeeThrough();
 };
 class MapScreen :public Screen {
-    HUDRender hudrender;
-    MapRender maprender;
     Player player;
     Map map;
     DropsPile drops;
@@ -74,7 +87,6 @@ public:
     bool isSeeThrough();
 };
 class PauseScreen:public Screen {
-    ButtonRender buttonrender;
     Button start;
     sf::RectangleShape shade;
 public:
@@ -86,6 +98,7 @@ public:
     bool isUpdateThrough();
     bool isSeeThrough();
 };
+
 class ScreenStack {
     static std::vector<Screen*> screens;
     static int size;
@@ -99,6 +112,7 @@ public:
 };
 class Game {
     Settings settings;
+    Renderer renderer;
 public:
     void run();
 };

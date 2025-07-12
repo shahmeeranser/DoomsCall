@@ -3,6 +3,97 @@
 int ScreenStack::size = 0;
 std::vector<Screen*> ScreenStack::screens;
 
+std::vector<sf::IntRect> Renderer::hudpart;
+std::vector<sf::IntRect> Renderer::itemsrect;
+sf::Sprite Renderer::hud;
+sf::Sprite Renderer::items;
+std::vector<sf::IntRect> Renderer::tilesrect;
+sf::Sprite Renderer::tiles;
+sf::Sprite Renderer::buttonsprite;
+sf::Sprite Renderer::slidersprite;
+
+Renderer::Renderer() {
+    hud.setTexture(Settings::getTexture(HUD));
+    hudpart.push_back(sf::IntRect(32, 0, 40, 40));
+    hudpart.push_back(sf::IntRect(72, 0, 40, 40));
+    hudpart.push_back(sf::IntRect(0, 0, 32, 16));
+    hudpart.push_back(sf::IntRect(0, 16, 32, 16));
+    for (int i = 0; i < 2; i++)
+    {
+        itemsrect.push_back(sf::IntRect(32 * i, 0, 32, 32));
+    }
+    items.setTexture(Settings::getTexture(ITEMS));
+
+    for (int i = 0; i < 2; i++)
+    {
+        tilesrect.push_back(sf::IntRect(32 * i, 0, 32, 32));
+    }
+    tiles.setTexture(Settings::getTexture(TILES));
+
+    buttonsprite.setTexture(Settings::getTexture(BUTTONS));
+    slidersprite.setTexture(Settings::getTexture(SLIDER));
+}
+void Renderer::RenderHUD(sf::RenderWindow& window, Player& player) {
+    hud.setScale(1, 1);
+    hud.setPosition(10, 10);
+    for (int i = 0; i < 9; i++) {
+        if (i == player.getInventory().getSelection()) {
+            hud.setTextureRect(hudpart[SELECTED]);
+        }
+        else {
+            hud.setTextureRect(hudpart[UNSELECTED]);
+        }
+        window.draw(hud);
+        if (player.getInventory().getItem(i)) {
+            ItemType t = player.getInventory().getItem(i)->getType();
+            items.setPosition(hud.getPosition() + sf::Vector2f(4, 4));
+            items.setTextureRect(itemsrect[t]);
+            window.draw(items);
+        }
+        hud.move(40, 0);
+    }
+    hud.setPosition(sf::Vector2f(15, 60));
+    hud.setTextureRect(hudpart[EMPTYHP]);
+    hud.setScale(6, 1);
+    window.draw(hud);
+    hud.setTextureRect(hudpart[FILLEDHP]);
+    hud.setScale(6 * (static_cast<float>(player.getHP()) / player.getMaxHP()), 1);
+    window.draw(hud);
+}
+void Renderer::RenderButton(sf::RenderWindow& window, Button& button) {
+    buttonsprite.setTextureRect(sf::IntRect(32 * button.getType(), 32 * button.isHovered(), 32, 32));
+    buttonsprite.setPosition(button.getPosition());
+    buttonsprite.setScale(button.getScale());
+    window.draw(buttonsprite);
+}
+void Renderer::RenderMap(sf::RenderWindow& window, Player& player, Map& map) {
+    sf::Vector2f center = player.getCamera().getCenter();
+    sf::Vector2f size = player.getCamera().getSize();
+    sf::FloatRect camera(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y);
+    int left = std::max(std::floor(camera.left) / 32, 0.f);
+    int top = std::max(std::floor(camera.top) / 32, 0.f);
+    int right = std::min(std::ceil((camera.left + camera.width) / 32), static_cast<float>(map.getRow()));
+    int bottom = std::min(std::ceil((camera.top + camera.height) / 32), static_cast<float>(map.getCol()));
+    for (int i = top; i < bottom; i++) {
+        for (int j = left; j < right; j++) {
+            if (map.map[j][i]) {
+                TileType t = map.map[j][i]->getType();
+                tiles.setTextureRect(tilesrect[t]);
+                tiles.setPosition(32 * j, 32 * i);
+                window.draw(tiles);
+            }
+        }
+    }
+}
+void Renderer::RenderSlider(sf::RenderWindow& window, Slider& slider) {
+    slidersprite.setScale(slider.getScale(0));
+    for (int i = 0; i < slider.getSections(); i++) {
+        slidersprite.setPosition(slider.getPosition(i));
+        slidersprite.setTextureRect(sf::IntRect(16 * (i == slider.getSelected()), 0, 16, 16));
+        window.draw(slidersprite);
+    }
+}
+
 MainScreen::MainScreen():
     start(Settings::getlength() / 2-64, Settings::getwidth() / 2-32, 2, PLAY),
     option(Settings::getlength() / 2, Settings::getwidth() / 2-32, 2, OPTIONS),
@@ -29,9 +120,9 @@ void MainScreen::update(float deltatime) {
 void MainScreen::render(sf::RenderWindow& window) {
     window.setView(window.getDefaultView());
     window.draw(title);
-    buttonrender.draw(window, start);
-    buttonrender.draw(window, option);
-    buttonrender.draw(window, exit);
+    Renderer::RenderButton(window, start);
+    Renderer::RenderButton(window, option);
+    Renderer::RenderButton(window, exit);
 }
 bool MainScreen::isWorkThrough() {
     return false;
@@ -65,10 +156,10 @@ void SettingsScreen::update(float deltatime) {
 }
 void SettingsScreen::render(sf::RenderWindow& window) {
     window.setView(window.getDefaultView());
-    buttonrender.draw(window, display);
-    buttonrender.draw(window, sound);
-    buttonrender.draw(window, controls);
-    buttonrender.draw(window, exit);
+    Renderer::RenderButton(window, display);
+    Renderer::RenderButton(window, sound);
+    Renderer::RenderButton(window, controls);
+    Renderer::RenderButton(window, exit);
 }
 bool SettingsScreen::isWorkThrough() {
     return false;
@@ -101,11 +192,11 @@ void SoundSettingsScreen::update(float deltatime) {
 }
 void SoundSettingsScreen::render(sf::RenderWindow& window) {
     window.setView(window.getDefaultView());
-    sliderrender.draw(window, master);
-    sliderrender.draw(window, effect);
-    sliderrender.draw(window, music);
-    sliderrender.draw(window, ambiant);
-    buttonrender.draw(window, exit);
+    Renderer::RenderSlider(window, master);
+    Renderer::RenderSlider(window, effect);
+    Renderer::RenderSlider(window, music);
+    Renderer::RenderSlider(window, ambiant);
+    Renderer::RenderButton(window, exit);
 }
 bool SoundSettingsScreen::isWorkThrough() {
     return false;
@@ -138,10 +229,10 @@ void MapScreen::render(sf::RenderWindow& window) {
     player.setCameraPosition();
     player.focus(window);
     drops.draw(window);
-    maprender.draw(window, player, map);
+    Renderer::RenderMap(window, player, map);
     player.draw(window);
     window.setView(window.getDefaultView());
-    hudrender.draw(window, player);
+    Renderer::RenderHUD(window, player);
 }
 bool MapScreen::isWorkThrough() {
     return false;
@@ -174,7 +265,7 @@ void PauseScreen::update(float deltatime) {
 void PauseScreen::render(sf::RenderWindow& window) {
     window.setView(window.getDefaultView());
     start.update(sf::Mouse::getPosition(window));
-    buttonrender.draw(window, start);
+    Renderer::RenderButton(window, start);
 }
 bool PauseScreen::isWorkThrough() {
     return false;
