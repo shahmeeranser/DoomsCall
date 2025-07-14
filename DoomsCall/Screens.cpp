@@ -11,6 +11,7 @@ std::vector<sf::IntRect> Renderer::tilesrect;
 sf::Sprite Renderer::tiles;
 sf::Sprite Renderer::buttonsprite;
 sf::Sprite Renderer::slidersprite;
+sf::Sprite Renderer::background;
 
 Renderer::Renderer() {
     hud.setTexture(Settings::getTexture(HUD));
@@ -32,20 +33,21 @@ Renderer::Renderer() {
 
     buttonsprite.setTexture(Settings::getTexture(BUTTONS));
     slidersprite.setTexture(Settings::getTexture(SLIDER));
+    background.setTexture(Settings::getTexture(BACKGROUND));
 }
 void Renderer::RenderHUD(sf::RenderWindow& window, Player& player) {
     hud.setScale(1, 1);
     hud.setPosition(10, 10);
     for (int i = 0; i < 9; i++) {
-        if (i == player.getInventory().getSelection()) {
+        if (i == player.getInv().getSelection()) {
             hud.setTextureRect(hudpart[SELECTED]);
         }
         else {
             hud.setTextureRect(hudpart[UNSELECTED]);
         }
         window.draw(hud);
-        if (player.getInventory().getItem(i)) {
-            ItemType t = player.getInventory().getItem(i)->getType();
+        if (player.getInv().getSlot(0,i).getItem()) {
+            ItemType t = player.getInv().getSlot(0, i).getItem()->getType();
             items.setPosition(hud.getPosition() + sf::Vector2f(4, 4));
             items.setTextureRect(itemsrect[t]);
             window.draw(items);
@@ -92,6 +94,9 @@ void Renderer::RenderSlider(sf::RenderWindow& window, Slider& slider) {
         slidersprite.setTextureRect(sf::IntRect(16 * (i == slider.getSelected()), 0, 16, 16));
         window.draw(slidersprite);
     }
+}
+void Renderer::RenderBackground(sf::RenderWindow& window) {
+    window.draw(background);
 }
 
 MainScreen::MainScreen():
@@ -210,7 +215,7 @@ bool SoundSettingsScreen::isSeeThrough() {
 
 MapScreen::MapScreen(int row, int col) :map(row, col) {
     player.setPosition({ 375.f * 0, -64.f});
-    drops.addItem(MEDKIT,sf::Vector2f(100,-32));
+    drops.addItem(BANDAGE,sf::Vector2f(100,-32));
 }
 void MapScreen::input(sf::RenderWindow& window, sf::Event& event) {
     static bool uWasPressed = false;
@@ -226,12 +231,15 @@ void MapScreen::update(float deltatime) {
     drops.update(player, map, deltatime);
 }
 void MapScreen::render(sf::RenderWindow& window) {
+    window.setView(window.getDefaultView());
+    Renderer::RenderBackground(window);
     player.setCameraPosition();
     player.focus(window);
     drops.draw(window);
     Renderer::RenderMap(window, player, map);
     player.draw(window);
     window.setView(window.getDefaultView());
+
     Renderer::RenderHUD(window, player);
 }
 bool MapScreen::isWorkThrough() {

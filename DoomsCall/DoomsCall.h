@@ -14,37 +14,50 @@ enum ItemType { MEDKIT,BANDAGE};
 
 class Item {
 protected:
-    int count;
+    int maxcount;
+    ItemType type;
+    bool isreduced;
 public:
     virtual void whenHeld(Player& player) = 0;
     virtual void whenUsed(Player& player) = 0;
-    virtual ItemType getType() = 0;
+    ItemType getType();
+    int getMaxCount();
+    bool isReducedWhenUsed();
     ~Item();
 };
 class Medkit :public Item {
 public:
+    Medkit();
     void whenHeld(Player& player);
     void whenUsed(Player& player);
-    ItemType getType();
 };
 class Bandage :public Item {
 public:
+    Bandage();
     void whenHeld(Player& player);
     void whenUsed(Player& player);
-    ItemType getType();
 };
-class Inventory {
-private:
-    int selection;
-    std::vector<Item*> inventory;
+
+class InvSlot {
+    Item* item;
+    int count;
 public:
-    Inventory();
+    InvSlot();
+    bool addItem(Item* item);
+    void useItem(Player& player);
+    void removeItem();
+    Item* getItem();
+    ~InvSlot();
+};
+class Inv {
+    int selection;
+    std::vector<std::vector<InvSlot>> inv;
+public:
+    Inv();
     void setSelection(int select);
     int getSelection();
-    void addItem(Item* item);
-    void removeItem();
-    Item* getItem(int select);
-    ~Inventory();
+    bool addItem(Item* item);
+    InvSlot& getSlot(int row, int col);
 };
 
 class Object {
@@ -92,13 +105,13 @@ private:
     int maxHP;
     int HP;
     float speed;
-    Inventory inventory;
+    Inv inv;
 public:
     Player();
     void heal(int amount);
     int getHP();
     int getMaxHP();
-    Inventory& getInventory();
+    Inv& getInv();
     void handleInput();
     void setCameraPosition();
     void focus(sf::RenderWindow& window);

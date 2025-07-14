@@ -5,55 +5,103 @@ Vector gravity(0, 800.f);
 Item::~Item() {
     
 }
+int Item::getMaxCount() {
+    return maxcount;
+}
+ItemType Item::getType() {
+    return type;
+}
+bool Item::isReducedWhenUsed() {
+    return isreduced;
+}
 
+Medkit::Medkit() {
+    type = MEDKIT;
+    maxcount = 16;
+    isreduced = true;
+}
 void Medkit::whenHeld(Player& player) {
 }
 void Medkit::whenUsed(Player& player) {
     player.heal(150);
 }
-ItemType Medkit::getType() {
-    return MEDKIT;
-}
 
+Bandage::Bandage() {
+    type = BANDAGE;
+    maxcount = 128;
+    isreduced = true;
+}
 void Bandage::whenHeld(Player& player) {
 }
 void Bandage::whenUsed(Player& player) {
     player.heal(25);
 }
-ItemType Bandage::getType() {
-    return BANDAGE;
+
+InvSlot::InvSlot() {
+    item = nullptr;
+    count = 0;
+}
+bool InvSlot::addItem(Item* item) {
+    if (this->item == nullptr) {
+        this->item = item;
+        count = 1;
+        return true;
+    }
+    else if (this->item->getType() == item->getType() && count < item ->getMaxCount()) {
+        count++;
+        return true;
+    }
+    return false;
+}
+void InvSlot::useItem(Player& player) {
+    if (item == nullptr) return;
+    item->whenUsed(player);
+    if (item->isReducedWhenUsed()) {
+        count--;
+        if (count < 1) {
+            removeItem();
+        }
+    }
+}
+void InvSlot::removeItem(){
+    delete item;
+    item = nullptr;
+}
+Item* InvSlot::getItem() {
+    return item;
+}
+InvSlot::~InvSlot() {
+    delete item;
 }
 
-Inventory::Inventory() {
-    inventory.resize(9);
-    for (int i = 0; i < 9; i++) {
-        inventory[i] = nullptr;
-    }
+Inv::Inv() {
     selection = 0;
+    inv.resize(4);
+    for (int i = 0; i < 3; i++) {
+        inv[i].resize(9);
+    }
 }
-void Inventory::setSelection(int select) {
+void Inv::setSelection(int select) {
     selection = select;
 }
-int Inventory::getSelection() {
+int Inv::getSelection() {
     return selection;
 }
-void Inventory::addItem(Item* item) {
-    if (inventory[selection] == nullptr) {
-        inventory[selection] = item;
+bool Inv::addItem(Item* item) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 9; j++) {
+            if (inv[i][j].addItem(item)) {
+                return true;
+            }
+        }
     }
+    return false;
 }
-void Inventory::removeItem() {
-    delete inventory[selection];
-    inventory[selection] = nullptr;
-}
-Item* Inventory::getItem(int select = -1) {
-    if (select == -1)select = selection;
-    return inventory[select];
-}
-Inventory::~Inventory() {
-    for (int i = 0; i < 9; i++) {
-        delete inventory[i];
+InvSlot& Inv::getSlot(int row = 0,int col = -1) {
+    if (col == -1) {
+        return inv[0][selection];
     }
+    return inv[row][col];
 }
 
 Object::Object(const sf::Vector2f& position = { 0.f, 0.f }){
@@ -152,7 +200,7 @@ Item* ItemDrop::getItem() {
 void ItemDrop::update(Player& player) {
     if (!ispicked && lifetime > 0) {
         lifetime--;
-        if(player.getBounds().intersects(getBounds()) && !player.getInventory().getItem()) {
+        if(player.getBounds().intersects(getBounds())) {
             ispicked = true;
         }
     }
@@ -177,9 +225,10 @@ void DropsPile::update(Player& player, Map& map, float deltatime) {
             continue;
         }
         if (items[i].getpicked()) {
-            player.getInventory().addItem(items[i].getItem());
-            items.erase(items.begin() - i);
-            i--;
+            if (player.getInv().addItem(items[i].getItem())) {
+                items.erase(items.begin() - i);
+                i--;
+            }
         }
     }
 }
@@ -191,7 +240,7 @@ void DropsPile::draw(sf::RenderWindow& window) {
 
 Player::Player(){
     shape = sf::Sprite(Settings::getTexture(PLAYER));
-    inventory.addItem(new Medkit());
+    inv.addItem(new Medkit());
     maxHP = 200;
     HP = 0;
     speed = 500.f;
@@ -209,23 +258,22 @@ int Player::getHP() {
 int Player::getMaxHP() {
     return maxHP;
 }
-Inventory& Player::getInventory() {
-    return inventory;
+Inv& Player::getInv() {
+    return inv;
 }
 void Player::handleInput() {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))inventory.setSelection(0);
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))inventory.setSelection(1);
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))inventory.setSelection(2);
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))inventory.setSelection(3);
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5))inventory.setSelection(4);
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num6))inventory.setSelection(5);
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num7))inventory.setSelection(6);
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num8))inventory.setSelection(7);
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num9))inventory.setSelection(8);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))inv.setSelection(0);
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))inv.setSelection(1);
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))inv.setSelection(2);
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))inv.setSelection(3);
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5))inv.setSelection(4);
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num6))inv.setSelection(5);
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num7))inv.setSelection(6);
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num8))inv.setSelection(7);
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num9))inv.setSelection(8);
 
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && inventory.getItem()) {
-        inventory.getItem()->whenUsed(*this);
-        inventory.removeItem();
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        inv.getSlot().useItem(*this);
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))

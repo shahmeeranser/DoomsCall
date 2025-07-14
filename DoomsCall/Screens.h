@@ -13,12 +13,14 @@ class Renderer {
     static sf::Sprite tiles;
     static sf::Sprite buttonsprite;
     static sf::Sprite slidersprite;
+    static sf::Sprite background;
 public:
     Renderer();
     static void RenderHUD(sf::RenderWindow& window, Player& player);
     static void RenderMap(sf::RenderWindow& window, Player& player, Map& map);
     static void RenderButton(sf::RenderWindow& window, Button& button);
     static void RenderSlider(sf::RenderWindow& window, Slider& slider);
+    static void RenderBackground(sf::RenderWindow& window);
 };
 
 class Screen {
@@ -116,4 +118,3 @@ class Game {
 public:
     void run();
 };
-

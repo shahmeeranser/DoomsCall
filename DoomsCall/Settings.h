@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 
-enum TextureType {EMPTY,TITLE,BUTTONS,SLIDER, HUD, TILES, ITEMS ,PLAYER};
+enum TextureType {EMPTY,TITLE,BUTTONS,SLIDER, HUD, TILES, ITEMS ,PLAYER,BACKGROUND};
 enum ButtonType {PLAY,OPTIONS,EXIT,DISPLAY,SOUND,CONTROLS};
 
 class Settings {

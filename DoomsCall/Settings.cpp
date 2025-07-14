@@ -58,6 +58,10 @@ Settings::Settings() {
             std::cerr << "FAIL";
         }
         textures.push_back(image);
+        if (!image.loadFromFile("resources/background.png")) {
+            std::cerr << "FAIL";
+        }
+        textures.push_back(image);
     }
 }
 int Settings::getlength() {
