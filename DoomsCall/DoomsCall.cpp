@@ -296,4 +296,3 @@ void Player::focus(sf::RenderWindow& window) {
 sf::View& Player::getCamera() {
     return camera;
 }
-
