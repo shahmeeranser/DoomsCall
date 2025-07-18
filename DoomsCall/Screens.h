@@ -60,6 +60,17 @@ public:
     bool isUpdateThrough();
     bool isSeeThrough();
 };
+class DisplaySettingsScreen:public Screen {
+    Button exit;
+public:
+    DisplaySettingsScreen();
+    void input(sf::RenderWindow& window, sf::Event& event);
+    void update(float deltatime);
+    void render(sf::RenderWindow& window);
+    bool isWorkThrough();
+    bool isUpdateThrough();
+    bool isSeeThrough();
+};
 class SoundSettingsScreen :public Screen {
     Slider master;
     Slider effect;
@@ -68,6 +79,17 @@ class SoundSettingsScreen :public Screen {
     Button exit;
 public:
     SoundSettingsScreen();
+    void input(sf::RenderWindow& window, sf::Event& event);
+    void update(float deltatime);
+    void render(sf::RenderWindow& window);
+    bool isWorkThrough();
+    bool isUpdateThrough();
+    bool isSeeThrough();
+};
+class ControlsSettingsScreen :public Screen {
+    Button exit;
+public:
+    ControlsSettingsScreen();
     void input(sf::RenderWindow& window, sf::Event& event);
     void update(float deltatime);
     void render(sf::RenderWindow& window);

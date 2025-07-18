@@ -104,27 +104,27 @@ InvSlot& Inv::getSlot(int row = 0,int col = -1) {
     return inv[row][col];
 }
 
-Object::Object(const sf::Vector2f& position = { 0.f, 0.f }){
-    shape.setPosition(position);
-}
-void Object::draw(sf::RenderWindow& window) const {
-    window.draw(shape);
+Object::Object(const sf::Vector2f& position,const sf::Vector2f& scale){
+    obj.left = position.x;
+    obj.top = position.y;
+    obj.width = scale.x;
+    obj.top = scale.y;
 }
 void Object::setPosition(const sf::Vector2f& position) {
-    shape.setPosition(position);
-}
-void Object::setPosition(float x, float y) {
-    shape.setPosition(x, y);
+    obj.left = position.x;
+    obj.top = position.y;
 }
 sf::Vector2f Object::getPosition() const {
-    return shape.getPosition();
+    return sf::Vector2f(obj.left,obj.top);
 }
 sf::FloatRect Object::getBounds() const {
-    return shape.getGlobalBounds();
+    return obj;
 }
 
-DynamicObject::DynamicObject(const sf::Vector2f& position = { 0.f, 0.f }):
-Object(position){
+DynamicObject::DynamicObject(const sf::Vector2f& position,const sf::Vector2f& scale):
+Object(position,scale){
+    velocity = Vector(0, 0);
+    acceleration = Vector(0, 0);
     grounded = false;
     hitceiling = false;
 }
@@ -135,7 +135,7 @@ void DynamicObject::simulateMovement(Map& game, float deltatime) {
     else {
         gravity.apply(velocity.value, deltatime);
     }
-    sf::Vector2f center = shape.getPosition();
+    sf::Vector2f center = obj.getPosition();
     sf::FloatRect bounds(center.x - 256 / 2, center.y - 256 / 2, 256, 256);
     int left = std::max(std::floor(bounds.left) / 32, 0.f);
     int top = std::max(std::floor(bounds.top) / 32, 0.f);
@@ -156,7 +156,7 @@ void DynamicObject::simulateMovement(Map& game, float deltatime) {
                 if (movement.x == 0.f)break;
             }
         }
-        shape.move(movement.x, 0.f);
+        obj.left += movement.x;
     }
     if (movement.y != 0.f) {
         futureBounds = getBounds(); 
@@ -176,13 +176,11 @@ void DynamicObject::simulateMovement(Map& game, float deltatime) {
                 if (movement.y == 0.f)break;
             }
         }
-        shape.move(0.f, movement.y);
+        obj.top += movement.y;
     }
 }
 
-ItemDrop::ItemDrop(ItemType item, sf::Vector2f location){
-    shape = sf::Sprite(Settings::getTexture(ITEMS), sf::IntRect(32 * item, 0, 32, 32));
-    shape.setPosition(location);
+ItemDrop::ItemDrop(ItemType item, sf::Vector2f location):DynamicObject(location,sf::Vector2f(32.f,32.f)){
     this->item = item;
     ispicked = false;
     lifetime = 1200;
@@ -232,14 +230,8 @@ void DropsPile::update(Player& player, Map& map, float deltatime) {
         }
     }
 }
-void DropsPile::draw(sf::RenderWindow& window) {
-    for (int i = 0; i < items.size(); i++) {
-        items[i].draw(window);
-    }
-}
 
-Player::Player(){
-    shape = sf::Sprite(Settings::getTexture(PLAYER));
+Player::Player() :DynamicObject(sf::Vector2f(0.f, 0.f), sf::Vector2f(32.f, 64.f)) {
     inv.addItem(new Medkit());
     maxHP = 200;
     HP = 0;

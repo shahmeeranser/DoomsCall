@@ -62,12 +62,10 @@ public:
 
 class Object {
 protected:
-    sf::Sprite shape;
+    sf::FloatRect obj;
 public:
-    Object(const sf::Vector2f& position);
-    void draw(sf::RenderWindow& window) const;
+    Object(const sf::Vector2f& position,const sf::Vector2f& scale);
     void setPosition(const sf::Vector2f& position);
-    void setPosition(float x, float y);
     sf::Vector2f getPosition() const;
     sf::FloatRect getBounds() const;
 };
@@ -78,7 +76,7 @@ protected:
     bool grounded;
     bool hitceiling;
 public:
-    DynamicObject(const sf::Vector2f& position);
+    DynamicObject(const sf::Vector2f& position,const sf::Vector2f& scale);
     void simulateMovement(Map& game, float deltatime);
 };
 class ItemDrop :public DynamicObject {
@@ -97,20 +95,19 @@ class DropsPile {
 public:
     void addItem(ItemType item,sf::Vector2f location);
     void update(Player& player, Map& map,float deltatime);
-    void draw(sf::RenderWindow& window);
 };
 class Player : public DynamicObject {
 private:
-    sf::View camera;
-    int maxHP;
     int HP;
+    int maxHP;
+    sf::View camera;
     float speed;
     Inv inv;
 public:
     Player();
-    void heal(int amount);
     int getHP();
     int getMaxHP();
+    void heal(int amount);
     Inv& getInv();
     void handleInput();
     void setCameraPosition();

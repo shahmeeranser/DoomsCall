@@ -150,8 +150,14 @@ void SettingsScreen::input(sf::RenderWindow& window, sf::Event& event) {
     sound.update(sf::Mouse::getPosition(window));
     controls.update(sf::Mouse::getPosition(window));
     exit.update(sf::Mouse::getPosition(window));
+    if (display.isClicked(event)) {
+        ScreenStack::push_screen(new DisplaySettingsScreen);
+    }
     if (sound.isClicked(event)) {
         ScreenStack::push_screen(new SoundSettingsScreen);
+    }
+    if (controls.isClicked(event)) {
+        ScreenStack::push_screen(new ControlsSettingsScreen);
     }
     if (exit.isClicked(event)) {
         ScreenStack::pop_screen();
@@ -173,6 +179,30 @@ bool SettingsScreen::isUpdateThrough() {
     return false;
 }
 bool SettingsScreen::isSeeThrough() {
+    return false;
+}
+
+DisplaySettingsScreen::DisplaySettingsScreen() :exit(Settings::getlength() / 2 - 32, Settings::getwidth() / 2 + 32, 2, EXIT) {
+}
+void DisplaySettingsScreen::input(sf::RenderWindow& window, sf::Event& event) {
+    exit.update(sf::Mouse::getPosition(window));
+    if (exit.isClicked(event)) {
+        ScreenStack::pop_screen();
+    }
+}
+void DisplaySettingsScreen::update(float deltatime) {
+}
+void DisplaySettingsScreen::render(sf::RenderWindow& window) {
+    window.setView(window.getDefaultView());
+    Renderer::RenderButton(window, exit);
+}
+bool DisplaySettingsScreen::isWorkThrough() {
+    return false;
+}
+bool DisplaySettingsScreen::isUpdateThrough() {
+    return false;
+}
+bool DisplaySettingsScreen::isSeeThrough() {
     return false;
 }
 
@@ -213,6 +243,30 @@ bool SoundSettingsScreen::isSeeThrough() {
     return false;
 }
 
+ControlsSettingsScreen::ControlsSettingsScreen() :exit(Settings::getlength() / 2 - 32, Settings::getwidth() / 2 + 32, 2, EXIT) {
+}
+void ControlsSettingsScreen::input(sf::RenderWindow& window, sf::Event& event) {
+    exit.update(sf::Mouse::getPosition(window));
+    if (exit.isClicked(event)) {
+        ScreenStack::pop_screen();
+    }
+}
+void ControlsSettingsScreen::update(float deltatime) {
+}
+void ControlsSettingsScreen::render(sf::RenderWindow& window) {
+    window.setView(window.getDefaultView());
+    Renderer::RenderButton(window, exit);
+}
+bool ControlsSettingsScreen::isWorkThrough() {
+    return false;
+}
+bool ControlsSettingsScreen::isUpdateThrough() {
+    return false;
+}
+bool ControlsSettingsScreen::isSeeThrough() {
+    return false;
+}
+
 MapScreen::MapScreen(int row, int col) :map(row, col) {
     player.setPosition({ 375.f * 0, -64.f});
     drops.addItem(BANDAGE,sf::Vector2f(100,-32));
@@ -235,9 +289,7 @@ void MapScreen::render(sf::RenderWindow& window) {
     Renderer::RenderBackground(window);
     player.setCameraPosition();
     player.focus(window);
-    drops.draw(window);
     Renderer::RenderMap(window, player, map);
-    player.draw(window);
     window.setView(window.getDefaultView());
 
     Renderer::RenderHUD(window, player);
