@@ -12,6 +12,7 @@ sf::Sprite Renderer::tiles;
 sf::Sprite Renderer::buttonsprite;
 sf::Sprite Renderer::slidersprite;
 sf::Sprite Renderer::background;
+sf::Sprite Renderer::player;
 
 Renderer::Renderer() {
     hud.setTexture(Settings::getTexture(HUD));
@@ -24,7 +25,6 @@ Renderer::Renderer() {
         itemsrect.push_back(sf::IntRect(32 * i, 0, 32, 32));
     }
     items.setTexture(Settings::getTexture(ITEMS));
-
     for (int i = 0; i < 2; i++)
     {
         tilesrect.push_back(sf::IntRect(32 * i, 0, 32, 32));
@@ -34,6 +34,7 @@ Renderer::Renderer() {
     buttonsprite.setTexture(Settings::getTexture(BUTTONS));
     slidersprite.setTexture(Settings::getTexture(SLIDER));
     background.setTexture(Settings::getTexture(BACKGROUND));
+    player.setTexture(Settings::getTexture(PLAYER));
 }
 void Renderer::RenderHUD(sf::RenderWindow& window, Player& player) {
     hud.setScale(1, 1);
@@ -97,6 +98,17 @@ void Renderer::RenderSlider(sf::RenderWindow& window, Slider& slider) {
 }
 void Renderer::RenderBackground(sf::RenderWindow& window) {
     window.draw(background);
+}
+void Renderer::RenderPlayer(sf::RenderWindow& window, Player& play) {
+    player.setPosition(play.getPosition());
+    window.draw(player);
+}
+void Renderer::RenderDropsPile(sf::RenderWindow& window, std::vector<ItemDrop>& pile) {
+    for (int i = 0; i < pile.size(); i++) {
+        items.setPosition(pile[i].getPosition());
+        items.setTextureRect(sf::IntRect(32 * pile[i].getItem()->getType(),0,32,32));
+        window.draw(items);
+    }
 }
 
 MainScreen::MainScreen():
@@ -268,8 +280,7 @@ bool ControlsSettingsScreen::isSeeThrough() {
 }
 
 MapScreen::MapScreen(int row, int col) :map(row, col) {
-    player.setPosition({ 375.f * 0, -64.f});
-    drops.addItem(BANDAGE,sf::Vector2f(100,-32));
+    drops.addItem(BANDAGE,sf::Vector2f(100,-320));
 }
 void MapScreen::input(sf::RenderWindow& window, sf::Event& event) {
     static bool uWasPressed = false;
@@ -289,6 +300,8 @@ void MapScreen::render(sf::RenderWindow& window) {
     Renderer::RenderBackground(window);
     player.setCameraPosition();
     player.focus(window);
+    Renderer::RenderDropsPile(window, drops.getPile());
+    Renderer::RenderPlayer(window, player);
     Renderer::RenderMap(window, player, map);
     window.setView(window.getDefaultView());
 

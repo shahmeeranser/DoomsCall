@@ -104,66 +104,75 @@ InvSlot& Inv::getSlot(int row = 0,int col = -1) {
     return inv[row][col];
 }
 
-Object::Object(const sf::Vector2f& position,const sf::Vector2f& scale){
-    obj.left = position.x;
-    obj.top = position.y;
-    obj.width = scale.x;
-    obj.top = scale.y;
+Obj::Obj() {
+    shape = sf::FloatRect(0, 0, 0, 0);
 }
-void Object::setPosition(const sf::Vector2f& position) {
-    obj.left = position.x;
-    obj.top = position.y;
+void Obj::setPosition(float x, float y) {
+    shape.left = x;
+    shape.top = y;
 }
-sf::Vector2f Object::getPosition() const {
-    return sf::Vector2f(obj.left,obj.top);
+void Obj::setSize(float x, float y) {
+    shape.width = x;
+    shape.height = y;
 }
-sf::FloatRect Object::getBounds() const {
-    return obj;
+sf::Vector2f Obj::getPosition(){
+    return sf::Vector2f(shape.left, shape.top);
+}
+sf::FloatRect Obj::getBounds(){
+    return shape;
 }
 
-DynamicObject::DynamicObject(const sf::Vector2f& position,const sf::Vector2f& scale):
-Object(position,scale){
+DynamicObj::DynamicObj() {
     velocity = Vector(0, 0);
     acceleration = Vector(0, 0);
-    grounded = false;
+    grounded = true;
     hitceiling = false;
 }
-void DynamicObject::simulateMovement(Map& game, float deltatime) {
+void DynamicObj::simulateMovement(Map& game, float deltatime) {
     if (grounded || hitceiling) {
         velocity = Vector(velocity.value.x, 0);
     }
     else {
         gravity.apply(velocity.value, deltatime);
     }
-    sf::Vector2f center = obj.getPosition();
-    sf::FloatRect bounds(center.x - 256 / 2, center.y - 256 / 2, 256, 256);
-    int left = std::max(std::floor(bounds.left) / 32, 0.f);
-    int top = std::max(std::floor(bounds.top) / 32, 0.f);
-    int right = std::min(std::ceil((bounds.left + bounds.width) / 32), static_cast<float>(game.getRow()));
-    int bottom = std::min(std::ceil((bounds.top + bounds.height) / 32), static_cast<float>(game.getCol()));
-    hitceiling = false;
+
+    sf::Vector2f center = getPosition();
+    sf::FloatRect bounds(center.x - 256 / 2.f, center.y - 256 / 2.f, 256.f, 256.f);
+
+    int left = std::max(static_cast<int>(std::floor(bounds.left / 32)), 0);
+    int top = std::max(static_cast<int>(std::floor(bounds.top / 32)), 0);
+    int right = std::min(static_cast<int>(std::ceil((bounds.left + bounds.width) / 32)), game.getCol());
+    int bottom = std::min(static_cast<int>(std::ceil((bounds.top + bounds.height) / 32)), game.getRow());
+
     grounded = false;
+    hitceiling = false;
+
     sf::Vector2f movement = velocity.value * deltatime;
     sf::FloatRect futureBounds = getBounds();
+
+    // Horizontal Movement
     if (movement.x != 0.f) {
         futureBounds.left += movement.x;
-        for (int i = top; i < bottom; i++) {
-            for (int j = left; j < right; j++) {
-                if (futureBounds.intersects(sf::FloatRect(32 * j, 32 * i, 32, 32)) && game.map[j][i]) {
+        for (int i = top; i < bottom; ++i) {
+            for (int j = left; j < right; ++j) {
+                if (futureBounds.intersects(sf::FloatRect(32 * j, 32 * i, 32, 32)) && game.map[i][j]) {
                     movement.x = 0.f;
                     break;
                 }
-                if (movement.x == 0.f)break;
             }
         }
-        obj.left += movement.x;
+
+        sf::Vector2f pos = getPosition();
+        setPosition(pos.x + movement.x, pos.y);
     }
+
+    // Vertical Movement
     if (movement.y != 0.f) {
-        futureBounds = getBounds(); 
+        futureBounds = getBounds(); // Recalculate after horizontal move
         futureBounds.top += movement.y;
-        for (int i = top; i < bottom; i++) {
-            for (int j = left; j < right; j++) {
-                if (futureBounds.intersects(sf::FloatRect(32 * j, 32 * i, 32, 32)) && game.map[j][i]) {
+        for (int i = top; i < bottom; ++i) {
+            for (int j = left; j < right; ++j) {
+                if (futureBounds.intersects(sf::FloatRect(32 * j, 32 * i, 32, 32)) && game.map[i][j]) {
                     if (movement.y < 0.f) {
                         hitceiling = true;
                     }
@@ -173,14 +182,17 @@ void DynamicObject::simulateMovement(Map& game, float deltatime) {
                     movement.y = 0.f;
                     break;
                 }
-                if (movement.y == 0.f)break;
             }
         }
-        obj.top += movement.y;
+
+        sf::Vector2f pos = getPosition();
+        setPosition(pos.x, pos.y + movement.y);
     }
 }
 
-ItemDrop::ItemDrop(ItemType item, sf::Vector2f location):DynamicObject(location,sf::Vector2f(32.f,32.f)){
+ItemDrop::ItemDrop(ItemType item, sf::Vector2f location){
+    setPosition(location.x, location.y);
+    setSize(32.f, 32.f);
     this->item = item;
     ispicked = false;
     lifetime = 1200;
@@ -230,8 +242,13 @@ void DropsPile::update(Player& player, Map& map, float deltatime) {
         }
     }
 }
+std::vector<ItemDrop>& DropsPile::getPile() {
+    return items;
+}
 
-Player::Player() :DynamicObject(sf::Vector2f(0.f, 0.f), sf::Vector2f(32.f, 64.f)) {
+Player::Player(){
+    setSize(32.f, 64.f);
+    setPosition(375.f, -300.f);
     inv.addItem(new Medkit());
     maxHP = 200;
     HP = 0;

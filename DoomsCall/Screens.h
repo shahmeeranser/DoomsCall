@@ -14,6 +14,7 @@ class Renderer {
     static sf::Sprite buttonsprite;
     static sf::Sprite slidersprite;
     static sf::Sprite background;
+    static sf::Sprite player;
 public:
     Renderer();
     static void RenderHUD(sf::RenderWindow& window, Player& player);
@@ -21,6 +22,8 @@ public:
     static void RenderButton(sf::RenderWindow& window, Button& button);
     static void RenderSlider(sf::RenderWindow& window, Slider& slider);
     static void RenderBackground(sf::RenderWindow& window);
+    static void RenderPlayer(sf::RenderWindow& window,Player& player);
+    static void RenderDropsPile(sf::RenderWindow& window, std::vector<ItemDrop>& pile);
 };
 
 class Screen {

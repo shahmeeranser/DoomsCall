@@ -60,26 +60,27 @@ public:
     InvSlot& getSlot(int row, int col);
 };
 
-class Object {
-protected:
-    sf::FloatRect obj;
+class Obj {
+    sf::FloatRect shape;
 public:
-    Object(const sf::Vector2f& position,const sf::Vector2f& scale);
-    void setPosition(const sf::Vector2f& position);
-    sf::Vector2f getPosition() const;
-    sf::FloatRect getBounds() const;
+    Obj();
+    void setPosition(float x, float y);
+    void setSize(float x,float y);
+    sf::Vector2f getPosition();
+    sf::FloatRect getBounds();
 };
-class DynamicObject:public Object {
+class DynamicObj :public Obj {
 protected:
     Vector velocity;
     Vector acceleration;
     bool grounded;
     bool hitceiling;
 public:
-    DynamicObject(const sf::Vector2f& position,const sf::Vector2f& scale);
+    DynamicObj();
     void simulateMovement(Map& game, float deltatime);
 };
-class ItemDrop :public DynamicObject {
+
+class ItemDrop :public DynamicObj {
     ItemType item;
     bool ispicked;
     int lifetime;
@@ -95,8 +96,9 @@ class DropsPile {
 public:
     void addItem(ItemType item,sf::Vector2f location);
     void update(Player& player, Map& map,float deltatime);
+    std::vector<ItemDrop>& getPile();
 };
-class Player : public DynamicObject {
+class Player : public DynamicObj {
 private:
     int HP;
     int maxHP;
