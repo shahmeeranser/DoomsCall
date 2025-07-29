@@ -5,6 +5,8 @@
 #include <fstream>
 #include <iostream>
 
+#define TILE_SIZE 16
+
 enum TextureType {EMPTY,TITLE,BUTTONS,SLIDER, HUD, TILES, ITEMS ,PLAYER,BACKGROUND};
 enum ButtonType {PLAY,OPTIONS,EXIT,DISPLAY,SOUND,CONTROLS};
 

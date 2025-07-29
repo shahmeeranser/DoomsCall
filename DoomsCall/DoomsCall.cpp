@@ -138,11 +138,10 @@ void DynamicObj::simulateMovement(Map& game, float deltatime) {
 
     sf::Vector2f center = getPosition();
     sf::FloatRect bounds(center.x - 256 / 2.f, center.y - 256 / 2.f, 256.f, 256.f);
-
-    int left = std::max(static_cast<int>(std::floor(bounds.left / 32)), 0);
-    int top = std::max(static_cast<int>(std::floor(bounds.top / 32)), 0);
-    int right = std::min(static_cast<int>(std::ceil((bounds.left + bounds.width) / 32)), game.getCol());
-    int bottom = std::min(static_cast<int>(std::ceil((bounds.top + bounds.height) / 32)), game.getRow());
+    int left = std::max(static_cast<int>(std::floor(bounds.left / TILE_SIZE)), 0);
+    int top = std::max(static_cast<int>(std::floor(bounds.top / TILE_SIZE)), 0);
+    int right = std::min(static_cast<int>(std::ceil((bounds.left + bounds.width) / TILE_SIZE)), game.getCol());
+    int bottom = std::min(static_cast<int>(std::ceil((bounds.top + bounds.height) / TILE_SIZE)), game.getRow());
 
     grounded = false;
     hitceiling = false;
@@ -150,12 +149,12 @@ void DynamicObj::simulateMovement(Map& game, float deltatime) {
     sf::Vector2f movement = velocity.value * deltatime;
     sf::FloatRect futureBounds = getBounds();
 
-    // Horizontal Movement
     if (movement.x != 0.f) {
         futureBounds.left += movement.x;
         for (int i = top; i < bottom; ++i) {
             for (int j = left; j < right; ++j) {
-                if (futureBounds.intersects(sf::FloatRect(32 * j, 32 * i, 32, 32)) && game.map[i][j]) {
+                if (futureBounds.intersects(sf::FloatRect(TILE_SIZE * j, TILE_SIZE * i, TILE_SIZE, TILE_SIZE)) && game.map[i][j]) {
+
                     movement.x = 0.f;
                     break;
                 }
@@ -165,14 +164,12 @@ void DynamicObj::simulateMovement(Map& game, float deltatime) {
         sf::Vector2f pos = getPosition();
         setPosition(pos.x + movement.x, pos.y);
     }
-
-    // Vertical Movement
     if (movement.y != 0.f) {
-        futureBounds = getBounds(); // Recalculate after horizontal move
+        futureBounds = getBounds(); 
         futureBounds.top += movement.y;
         for (int i = top; i < bottom; ++i) {
             for (int j = left; j < right; ++j) {
-                if (futureBounds.intersects(sf::FloatRect(32 * j, 32 * i, 32, 32)) && game.map[i][j]) {
+                if (futureBounds.intersects(sf::FloatRect(TILE_SIZE * j, TILE_SIZE * i, TILE_SIZE, TILE_SIZE)) && game.map[i][j]) {
                     if (movement.y < 0.f) {
                         hitceiling = true;
                     }
@@ -248,7 +245,7 @@ std::vector<ItemDrop>& DropsPile::getPile() {
 
 Player::Player(){
     setSize(32.f, 64.f);
-    setPosition(375.f, -300.f);
+    setPosition(384.f, -640.f);
     inv.addItem(new Medkit());
     maxHP = 200;
     HP = 0;
@@ -304,4 +301,22 @@ void Player::focus(sf::RenderWindow& window) {
 }
 sf::View& Player::getCamera() {
     return camera;
+}
+
+int Entity::getHP() {
+    return HP;
+}
+int Entity::getMaxHP() {
+    return maxHP;
+}
+
+Chicken::Chicken(float x,float y){
+    type = CHICKEN;
+    setSize(32, 32);
+    setPosition(x, y);
+    maxHP = 100;
+    HP = 100;
+}
+void Chicken::handleAI() {
+
 }

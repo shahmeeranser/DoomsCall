@@ -27,7 +27,7 @@ Renderer::Renderer() {
     items.setTexture(Settings::getTexture(ITEMS));
     for (int i = 0; i < 2; i++)
     {
-        tilesrect.push_back(sf::IntRect(32 * i, 0, 32, 32));
+        tilesrect.push_back(sf::IntRect(TILE_SIZE * i, 0, TILE_SIZE, TILE_SIZE));
     }
     tiles.setTexture(Settings::getTexture(TILES));
 
@@ -73,16 +73,16 @@ void Renderer::RenderMap(sf::RenderWindow& window, Player& player, Map& map) {
     sf::Vector2f center = player.getCamera().getCenter();
     sf::Vector2f size = player.getCamera().getSize();
     sf::FloatRect camera(center.x - size.x / 2, center.y - size.y / 2, size.x, size.y);
-    int left = std::max(std::floor(camera.left) / 32, 0.f);
-    int top = std::max(std::floor(camera.top) / 32, 0.f);
-    int right = std::min(std::ceil((camera.left + camera.width) / 32), static_cast<float>(map.getRow()));
-    int bottom = std::min(std::ceil((camera.top + camera.height) / 32), static_cast<float>(map.getCol()));
+    int left = std::max(std::floor(camera.left) / TILE_SIZE, 0.f);
+    int top = std::max(std::floor(camera.top) / TILE_SIZE, 0.f);
+    int right = std::min(std::ceil((camera.left + camera.width) / TILE_SIZE), static_cast<float>(map.getRow()));
+    int bottom = std::min(std::ceil((camera.top + camera.height) / TILE_SIZE), static_cast<float>(map.getCol()));
     for (int i = top; i < bottom; i++) {
         for (int j = left; j < right; j++) {
-            if (map.map[j][i]) {
-                TileType t = map.map[j][i]->getType();
+            if (map.map[i][j]) {
+                TileType t = map.map[i][j]->getType();
                 tiles.setTextureRect(tilesrect[t]);
-                tiles.setPosition(32 * j, 32 * i);
+                tiles.setPosition(TILE_SIZE * j, TILE_SIZE * i);
                 window.draw(tiles);
             }
         }
@@ -123,7 +123,7 @@ void MainScreen::input(sf::RenderWindow& window, sf::Event& event) {
     option.update(sf::Mouse::getPosition(window));
     exit.update(sf::Mouse::getPosition(window));
     if (start.isClicked(event)) {
-        ScreenStack::push_screen(new MapScreen(2048,2048));
+        ScreenStack::push_screen(new MapScreen(128,128));
     }
     if (option.isClicked(event)) {
         ScreenStack::push_screen(new SettingsScreen);

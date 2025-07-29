@@ -11,6 +11,7 @@ class DynamicObject;
 class Player;
 
 enum ItemType { MEDKIT,BANDAGE};
+enum EntityType {CHICKEN};
 
 class Item {
 protected:
@@ -115,4 +116,20 @@ public:
     void setCameraPosition();
     void focus(sf::RenderWindow& window);
     sf::View& getCamera();
+};
+class Entity :public DynamicObj {
+protected:
+    int HP;
+    int maxHP;
+    EntityType type;
+public:
+    int getHP();
+    int getMaxHP();
+    EntityType getType();
+    virtual void handleAI() = 0;
+};
+class Chicken :public Entity {
+public:
+    Chicken(float x,float y);
+    void handleAI();
 };

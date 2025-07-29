@@ -176,10 +176,10 @@ Map::Map(int row, int col) {
     for (int i = 0; i < row; i++) {
         map[i].resize(col);
         for (int j = 0; j < col; j++) {
-            if (i % 2)
+            if (i + j > col && j < i)
                 map[i][j] = new Grass;
             else
-                map[i][j] = new Spike;
+                map[i][j] = nullptr;
         }
     }
 }
