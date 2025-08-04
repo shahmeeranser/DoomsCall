@@ -27,13 +27,17 @@ public:
 };
 
 class Screen {
+protected:
+    bool isinputthrough;
+    bool isupdatethrough;
+    bool isrenderthrough;
 public:
     virtual void input(sf::RenderWindow& window, sf::Event& event) = 0;
     virtual void update(float deltatime) = 0;
     virtual void render(sf::RenderWindow& window) = 0;
-    virtual bool isWorkThrough() = 0;
-    virtual bool isUpdateThrough() = 0;
-    virtual bool isSeeThrough() = 0;
+    bool isInputThrough();
+    bool isUpdateThrough();
+    bool isRenderThrough();
 };
 class MainScreen :public Screen {
     sf::Sprite title;
@@ -45,9 +49,6 @@ public:
     void input(sf::RenderWindow& window, sf::Event& event);
     void update(float deltatime);
     void render(sf::RenderWindow& window);
-    bool isWorkThrough();
-    bool isUpdateThrough();
-    bool isSeeThrough();
 };
 class SettingsScreen:public Screen {
     Button display;
@@ -59,9 +60,6 @@ public:
     void input(sf::RenderWindow& window, sf::Event& event);
     void update(float deltatime);
     void render(sf::RenderWindow& window);
-    bool isWorkThrough();
-    bool isUpdateThrough();
-    bool isSeeThrough();
 };
 class DisplaySettingsScreen:public Screen {
     Button exit;
@@ -70,9 +68,6 @@ public:
     void input(sf::RenderWindow& window, sf::Event& event);
     void update(float deltatime);
     void render(sf::RenderWindow& window);
-    bool isWorkThrough();
-    bool isUpdateThrough();
-    bool isSeeThrough();
 };
 class SoundSettingsScreen :public Screen {
     Slider master;
@@ -85,9 +80,6 @@ public:
     void input(sf::RenderWindow& window, sf::Event& event);
     void update(float deltatime);
     void render(sf::RenderWindow& window);
-    bool isWorkThrough();
-    bool isUpdateThrough();
-    bool isSeeThrough();
 };
 class ControlsSettingsScreen :public Screen {
     Button exit;
@@ -96,9 +88,6 @@ public:
     void input(sf::RenderWindow& window, sf::Event& event);
     void update(float deltatime);
     void render(sf::RenderWindow& window);
-    bool isWorkThrough();
-    bool isUpdateThrough();
-    bool isSeeThrough();
 };
 class MapScreen :public Screen {
     Player player;
@@ -109,9 +98,6 @@ public:
     void input(sf::RenderWindow& window, sf::Event& event);
     void update(float deltatime);
     void render(sf::RenderWindow& window);
-    bool isWorkThrough();
-    bool isUpdateThrough();
-    bool isSeeThrough();
 };
 class PauseScreen:public Screen {
     Button start;
@@ -121,9 +107,6 @@ public:
     void input(sf::RenderWindow& window, sf::Event& event);
     void update(float deltatime);
     void render(sf::RenderWindow& window);
-    bool isWorkThrough();
-    bool isUpdateThrough();
-    bool isSeeThrough();
 };
 
 class ScreenStack {

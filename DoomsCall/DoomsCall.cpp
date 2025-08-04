@@ -135,7 +135,6 @@ void DynamicObj::simulateMovement(Map& game, float deltatime) {
     else {
         gravity.apply(velocity.value, deltatime);
     }
-
     sf::Vector2f center = getPosition();
     sf::FloatRect bounds(center.x - 256 / 2.f, center.y - 256 / 2.f, 256.f, 256.f);
     int left = std::max(static_cast<int>(std::floor(bounds.left / TILE_SIZE)), 0);

@@ -111,10 +111,23 @@ void Renderer::RenderDropsPile(sf::RenderWindow& window, std::vector<ItemDrop>& 
     }
 }
 
+bool Screen::isInputThrough() {
+    return isinputthrough;
+}
+bool Screen::isUpdateThrough() {
+    return isupdatethrough;
+}
+bool Screen::isRenderThrough() {
+    return isrenderthrough;
+}
+
 MainScreen::MainScreen():
     start(Settings::getlength() / 2-64, Settings::getwidth() / 2-32, 2, PLAY),
     option(Settings::getlength() / 2, Settings::getwidth() / 2-32, 2, OPTIONS),
     exit(Settings::getlength() / 2-32, Settings::getwidth() / 2+32, 2, EXIT) {
+    isinputthrough = false;
+    isupdatethrough = false;
+    isrenderthrough = false;
     title = sf::Sprite(Settings::getTexture(TITLE));
     title.setPosition(Settings::getlength() / 2 - 190,40);
 }
@@ -141,21 +154,15 @@ void MainScreen::render(sf::RenderWindow& window) {
     Renderer::RenderButton(window, option);
     Renderer::RenderButton(window, exit);
 }
-bool MainScreen::isWorkThrough() {
-    return false;
-}
-bool MainScreen::isUpdateThrough() {
-    return false;
-}
-bool MainScreen::isSeeThrough() {
-    return false;
-}
 
 SettingsScreen::SettingsScreen() :
     display(Settings::getlength() / 2 - 96, Settings::getwidth() / 2 - 32, 2, DISPLAY),
     sound(Settings::getlength() / 2 - 32, Settings::getwidth() / 2 - 32, 2, SOUND),
     controls(Settings::getlength() / 2 + 32, Settings::getwidth() / 2-32, 2, CONTROLS),
     exit(Settings::getlength() / 2 - 32, Settings::getwidth() / 2 + 32, 2, EXIT) {
+    isinputthrough = false;
+    isupdatethrough = false;
+    isrenderthrough = false;
 }
 void SettingsScreen::input(sf::RenderWindow& window, sf::Event& event) {
     display.update(sf::Mouse::getPosition(window));
@@ -184,17 +191,11 @@ void SettingsScreen::render(sf::RenderWindow& window) {
     Renderer::RenderButton(window, controls);
     Renderer::RenderButton(window, exit);
 }
-bool SettingsScreen::isWorkThrough() {
-    return false;
-}
-bool SettingsScreen::isUpdateThrough() {
-    return false;
-}
-bool SettingsScreen::isSeeThrough() {
-    return false;
-}
 
 DisplaySettingsScreen::DisplaySettingsScreen() :exit(Settings::getlength() / 2 - 32, Settings::getwidth() / 2 + 32, 2, EXIT) {
+    isinputthrough = false;
+    isupdatethrough = false;
+    isrenderthrough = false;
 }
 void DisplaySettingsScreen::input(sf::RenderWindow& window, sf::Event& event) {
     exit.update(sf::Mouse::getPosition(window));
@@ -208,15 +209,6 @@ void DisplaySettingsScreen::render(sf::RenderWindow& window) {
     window.setView(window.getDefaultView());
     Renderer::RenderButton(window, exit);
 }
-bool DisplaySettingsScreen::isWorkThrough() {
-    return false;
-}
-bool DisplaySettingsScreen::isUpdateThrough() {
-    return false;
-}
-bool DisplaySettingsScreen::isSeeThrough() {
-    return false;
-}
 
 SoundSettingsScreen::SoundSettingsScreen() :
     master(Settings::getlength() / 2 - 160, Settings::getwidth() / 2 - 144, 1, 20,19),
@@ -224,6 +216,9 @@ SoundSettingsScreen::SoundSettingsScreen() :
     music(Settings::getlength() / 2 - 160, Settings::getwidth() / 2 - 16, 1, 20,19),
     ambiant(Settings::getlength() / 2 - 160, Settings::getwidth() / 2 + 48, 1,20,19),
     exit(Settings::getlength() / 2 - 32, Settings::getwidth() - 64, 2, EXIT) {
+    isinputthrough = false;
+    isupdatethrough = false;
+    isrenderthrough = false;
 }
 void SoundSettingsScreen::input(sf::RenderWindow& window, sf::Event& event) {
     master.update(sf::Mouse::getPosition(window),event);
@@ -245,17 +240,11 @@ void SoundSettingsScreen::render(sf::RenderWindow& window) {
     Renderer::RenderSlider(window, ambiant);
     Renderer::RenderButton(window, exit);
 }
-bool SoundSettingsScreen::isWorkThrough() {
-    return false;
-}
-bool SoundSettingsScreen::isUpdateThrough() {
-    return false;
-}
-bool SoundSettingsScreen::isSeeThrough() {
-    return false;
-}
 
 ControlsSettingsScreen::ControlsSettingsScreen() :exit(Settings::getlength() / 2 - 32, Settings::getwidth() / 2 + 32, 2, EXIT) {
+    isinputthrough = false;
+    isupdatethrough = false;
+    isrenderthrough = false;
 }
 void ControlsSettingsScreen::input(sf::RenderWindow& window, sf::Event& event) {
     exit.update(sf::Mouse::getPosition(window));
@@ -269,17 +258,11 @@ void ControlsSettingsScreen::render(sf::RenderWindow& window) {
     window.setView(window.getDefaultView());
     Renderer::RenderButton(window, exit);
 }
-bool ControlsSettingsScreen::isWorkThrough() {
-    return false;
-}
-bool ControlsSettingsScreen::isUpdateThrough() {
-    return false;
-}
-bool ControlsSettingsScreen::isSeeThrough() {
-    return false;
-}
 
 MapScreen::MapScreen(int row, int col) :map(row, col) {
+    isinputthrough = false;
+    isupdatethrough = false;
+    isrenderthrough = false;
     drops.addItem(BANDAGE,sf::Vector2f(100,-320));
 }
 void MapScreen::input(sf::RenderWindow& window, sf::Event& event) {
@@ -307,17 +290,11 @@ void MapScreen::render(sf::RenderWindow& window) {
 
     Renderer::RenderHUD(window, player);
 }
-bool MapScreen::isWorkThrough() {
-    return false;
-}
-bool MapScreen::isUpdateThrough() {
-    return false;
-}
-bool MapScreen::isSeeThrough() {
-    return false;
-}
 
 PauseScreen::PauseScreen() :start(Settings::getlength() / 2, Settings::getwidth() / 2 , 2, PLAY) {
+    isinputthrough = false;
+    isupdatethrough = false;
+    isrenderthrough = true;
     shade.setSize(sf::Vector2f(Settings::getlength(),Settings::getwidth()));
 }
 void PauseScreen::input(sf::RenderWindow& window, sf::Event& event) {
@@ -340,15 +317,6 @@ void PauseScreen::render(sf::RenderWindow& window) {
     start.update(sf::Mouse::getPosition(window));
     Renderer::RenderButton(window, start);
 }
-bool PauseScreen::isWorkThrough() {
-    return false;
-}
-bool PauseScreen::isUpdateThrough() {
-    return false;
-}
-bool PauseScreen::isSeeThrough() {
-    return true;
-}
 
 int ScreenStack::getsize() {
     return size;
@@ -365,7 +333,7 @@ void ScreenStack::pop_screen() {
 }
 void ScreenStack::input(sf::RenderWindow& window, sf::Event& event, int point) {
     if (!size||Settings::getDelay())return;
-    if (screens[point]->isWorkThrough()) {
+    if (screens[point]->isInputThrough()) {
         input(window,event,point - 1);
     }
     screens[point]->input(window,event);
@@ -379,7 +347,7 @@ void ScreenStack::update(float deltatime,int point) {
 }
 void ScreenStack::render(sf::RenderWindow& window, int point) {
     if (!size)return;
-    if (screens[point]->isSeeThrough()) {
+    if (screens[point]->isRenderThrough()) {
         render(window,point - 1);
     }
     screens[point]->render(window);
