@@ -4,6 +4,15 @@
 
 enum HUDType { SELECTED, UNSELECTED, FILLEDHP, EMPTYHP };
 
+class Animater {
+    static sf::Sprite player;
+    static int playerx;
+    static int playery;
+public:
+    Animater();
+    static sf::Sprite& HandlePlayerAnimation(Player& player);
+};
+
 class Renderer {
     static std::vector<sf::IntRect> hudpart;
     static std::vector<sf::IntRect> itemsrect;
@@ -14,10 +23,11 @@ class Renderer {
     static sf::Sprite buttonsprite;
     static sf::Sprite slidersprite;
     static sf::Sprite background;
-    static sf::Sprite player;
+    static sf::Text text;
 public:
     Renderer();
     static void RenderHUD(sf::RenderWindow& window, Player& player);
+    static void RenderTile(sf::RenderWindow& window,TileType type,int i, int j);
     static void RenderMap(sf::RenderWindow& window, Player& player, Map& map);
     static void RenderButton(sf::RenderWindow& window, Button& button);
     static void RenderSlider(sf::RenderWindow& window, Slider& slider);
@@ -101,7 +111,8 @@ public:
 };
 class PauseScreen:public Screen {
     Button start;
-    sf::RectangleShape shade;
+    Button option;
+    Button exit;
 public:
     PauseScreen();
     void input(sf::RenderWindow& window, sf::Event& event);
@@ -116,12 +127,14 @@ public:
     static int getsize();
     static void push_screen(Screen* screen);
     static void pop_screen();
+    static void reset();
     static void input(sf::RenderWindow& window, sf::Event& event,int point);
     static void update(float deltatime, int point);
     static void render(sf::RenderWindow& window, int point);
 };
 class Game {
     Settings settings;
+    Animater animater;
     Renderer renderer;
 public:
     void run();

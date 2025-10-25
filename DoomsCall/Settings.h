@@ -17,12 +17,14 @@ class Settings {
     static int width;
     static int maxFPS;
     static std::vector<sf::Texture> textures;
+    static sf::Font font;
 public:
     Settings();
     static int getlength();
     static int getwidth();
     static int getmaxFPS();
     static int getDelay();
+    static sf::Font& getFont();
     static void setDelay(int val);
     static void updateDelay();
     const sf::Uint8* geticon();

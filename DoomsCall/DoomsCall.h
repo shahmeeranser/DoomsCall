@@ -47,6 +47,7 @@ public:
     bool addItem(Item* item);
     void useItem(Player& player);
     void removeItem();
+    int getCount();
     Item* getItem();
     ~InvSlot();
 };

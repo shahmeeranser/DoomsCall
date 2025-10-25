@@ -67,6 +67,9 @@ void InvSlot::removeItem(){
     delete item;
     item = nullptr;
 }
+int InvSlot::getCount() {
+    return count;
+}
 Item* InvSlot::getItem() {
     return item;
 }

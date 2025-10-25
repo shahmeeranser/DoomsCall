@@ -5,6 +5,7 @@ int Settings::width = 100;
 int Settings::maxFPS = 60;
 int Settings::inputdelay = 0;
 std::vector<sf::Texture> Settings::textures;
+sf::Font Settings::font;
 
 Settings::Settings() {
     if (!icon.loadFromFile("DoomsCall.ico")) {
@@ -22,8 +23,7 @@ Settings::Settings() {
     fin >> width;
     fin >> maxFPS;
     fin.close();
-
-    //loading all the images
+    //loading all the assets
     {
         sf::Texture image;
         if (!image.loadFromFile("resources/no_texture.png")) {
@@ -62,6 +62,9 @@ Settings::Settings() {
             std::cerr << "FAIL";
         }
         textures.push_back(image);
+        if (!font.loadFromFile("resources/fonts/yoster.ttf")) {
+            std::cerr << "FAIL";
+        }
     }
 }
 int Settings::getlength() {
@@ -76,6 +79,9 @@ int Settings::getmaxFPS() {
 int Settings::getDelay() {
     return inputdelay;
 }
+sf::Font& Settings::getFont() {
+    return font;
+}
 void Settings::setDelay(int val) {
     inputdelay = val;
 }
@@ -89,8 +95,8 @@ sf::Texture& Settings::getTexture(TextureType type) {
     return textures[static_cast<int>(type)];
 }
 
-Button::Button(float x, float y, float scale, ButtonType type) :location(x, y, 32 * scale, 32 * scale)
-{
+Button::Button(float x, float y, float scale, ButtonType type) :
+    location(x, y, 32 * scale, 32 * scale){
     this->type = type;
     ishovered = false;
 }
