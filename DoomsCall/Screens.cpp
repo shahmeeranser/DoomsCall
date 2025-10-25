@@ -6,6 +6,8 @@ std::vector<Screen*> ScreenStack::screens;
 sf::Sprite Animater::player;
 int Animater::playerx = 0;
 int Animater::playery = 0;
+sf::Sprite Animater::buttonsprite;
+sf::Sprite Animater::togglebuttonsprite;
 
 std::vector<sf::IntRect> Renderer::hudpart;
 std::vector<sf::IntRect> Renderer::itemsrect;
@@ -13,7 +15,6 @@ sf::Sprite Renderer::hud;
 sf::Sprite Renderer::items;
 std::vector<sf::IntRect> Renderer::tilesrect;
 sf::Sprite Renderer::tiles;
-sf::Sprite Renderer::buttonsprite;
 sf::Sprite Renderer::slidersprite;
 sf::Sprite Renderer::background;
 sf::Text Renderer::text;
@@ -21,6 +22,20 @@ sf::Text Renderer::text;
 Animater::Animater(){
     player.setTexture(Settings::getTexture(PLAYER));
     player.setTextureRect(sf::IntRect(0, 0, 56, 120));
+    buttonsprite.setTexture(Settings::getTexture(BUTTONS));
+    togglebuttonsprite.setTexture(Settings::getTexture(TOGGLEBUTTONS));
+}
+sf::Sprite& Animater::HandleButtonAnimation(Button& button) {
+    buttonsprite.setTextureRect(sf::IntRect(32 * button.getType(), 32 * button.isHovered(), 32, 32));
+    buttonsprite.setPosition(button.getPosition());
+    buttonsprite.setScale(button.getScale());
+    return buttonsprite;
+}
+sf::Sprite& Animater::HandleToggleButtonAnimation(ToggleButton& button) {
+    togglebuttonsprite.setTextureRect(sf::IntRect(24 * button.isHovered(), 16 * button.isON(), 24, 16));
+    togglebuttonsprite.setPosition(button.getPosition());
+    togglebuttonsprite.setScale(button.getScale());
+    return togglebuttonsprite;
 }
 sf::Sprite& Animater::HandlePlayerAnimation(Player& character) {
     if(rand() % 4 == 0) playerx++;
@@ -50,7 +65,6 @@ Renderer::Renderer() {
     }
     tiles.setTexture(Settings::getTexture(TILES));
 
-    buttonsprite.setTexture(Settings::getTexture(BUTTONS));
     slidersprite.setTexture(Settings::getTexture(SLIDER));
     background.setTexture(Settings::getTexture(BACKGROUND));
 }
@@ -85,10 +99,7 @@ void Renderer::RenderHUD(sf::RenderWindow& window, Player& player) {
     window.draw(hud);
 }
 void Renderer::RenderButton(sf::RenderWindow& window, Button& button) {
-    buttonsprite.setTextureRect(sf::IntRect(32 * button.getType(), 32 * button.isHovered(), 32, 32));
-    buttonsprite.setPosition(button.getPosition());
-    buttonsprite.setScale(button.getScale());
-    window.draw(buttonsprite);
+   window.draw(Animater::HandleButtonAnimation(button));
 }
 void Renderer::RenderTile(sf::RenderWindow& window,TileType type,int i,int j) {
         tiles.setTextureRect(tilesrect[type]);
@@ -116,6 +127,9 @@ void Renderer::RenderSlider(sf::RenderWindow& window, Slider& slider) {
         slidersprite.setTextureRect(sf::IntRect(16 * (i == slider.getSelected()), 0, 16, 16));
         window.draw(slidersprite);
     }
+}
+void Renderer::RenderToggleButton(sf::RenderWindow& window, ToggleButton& button) {
+    window.draw(Animater::HandleToggleButtonAnimation(button));
 }
 void Renderer::RenderBackground(sf::RenderWindow& window) {
     window.draw(background);
@@ -176,9 +190,10 @@ void MainScreen::render(sf::RenderWindow& window) {
 }
 
 SettingsScreen::SettingsScreen() :
-    display(Settings::getlength() / 2 - 96, Settings::getwidth() / 2 - 32, 2, DISPLAY),
-    sound(Settings::getlength() / 2 - 32, Settings::getwidth() / 2 - 32, 2, SOUND),
-    controls(Settings::getlength() / 2 + 32, Settings::getwidth() / 2-32, 2, CONTROLS),
+    display(Settings::getlength() / 2 - 128, Settings::getwidth() / 2 - 32, 2, DISPLAY),
+    sound(Settings::getlength() / 2 - 64, Settings::getwidth() / 2 - 32, 2, SOUND),
+    controls(Settings::getlength() / 2, Settings::getwidth() / 2-32, 2, CONTROLS),
+    debug(Settings::getlength() / 2 + 64, Settings::getwidth() / 2 - 32, 2, DEBUG),
     exit(Settings::getlength() / 2 - 32, Settings::getwidth() / 2 + 32, 2, EXIT) {
     isinputthrough = false;
     isupdatethrough = false;
@@ -188,6 +203,7 @@ void SettingsScreen::input(sf::RenderWindow& window, sf::Event& event) {
     display.update(sf::Mouse::getPosition(window));
     sound.update(sf::Mouse::getPosition(window));
     controls.update(sf::Mouse::getPosition(window));
+    debug.update(sf::Mouse::getPosition(window));
     exit.update(sf::Mouse::getPosition(window));
     if (display.isClicked(event)) {
         ScreenStack::push_screen(new DisplaySettingsScreen);
@@ -197,6 +213,9 @@ void SettingsScreen::input(sf::RenderWindow& window, sf::Event& event) {
     }
     if (controls.isClicked(event)) {
         ScreenStack::push_screen(new ControlsSettingsScreen);
+    }
+    if (debug.isClicked(event)) {
+        ScreenStack::push_screen(new DebugSettingsScreen);
     }
     if (exit.isClicked(event)) {
         ScreenStack::pop_screen();
@@ -209,6 +228,7 @@ void SettingsScreen::render(sf::RenderWindow& window) {
     Renderer::RenderButton(window, display);
     Renderer::RenderButton(window, sound);
     Renderer::RenderButton(window, controls);
+    Renderer::RenderButton(window, debug);
     Renderer::RenderButton(window, exit);
 }
 
@@ -276,6 +296,29 @@ void ControlsSettingsScreen::update(float deltatime) {
 }
 void ControlsSettingsScreen::render(sf::RenderWindow& window) {
     window.setView(window.getDefaultView());
+    Renderer::RenderButton(window, exit);
+}
+
+DebugSettingsScreen::DebugSettingsScreen() :
+    showFPS(Settings::getlength() / 2 - 32,Settings::getwidth() / 2 - 32, 2,0),
+    exit(Settings::getlength() / 2 - 32, Settings::getwidth() / 2 + 32, 2, EXIT) {
+    isinputthrough = false;
+    isupdatethrough = false;
+    isrenderthrough = false;
+}
+void DebugSettingsScreen::input(sf::RenderWindow& window, sf::Event& event) {
+    showFPS.update(sf::Mouse::getPosition(window));
+    exit.update(sf::Mouse::getPosition(window));
+    if (exit.isClicked(event)) {
+        ScreenStack::pop_screen();
+    }
+    showFPS.Clicked(event);
+}
+void DebugSettingsScreen::update(float deltatime) {
+}
+void DebugSettingsScreen::render(sf::RenderWindow& window) {
+    window.setView(window.getDefaultView());
+    Renderer::RenderToggleButton(window, showFPS);
     Renderer::RenderButton(window, exit);
 }
 

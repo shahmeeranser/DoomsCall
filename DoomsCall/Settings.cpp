@@ -42,6 +42,10 @@ Settings::Settings() {
             std::cerr << "FAIL";
         }
         textures.push_back(image);
+        if (!image.loadFromFile("resources/icons/toggle.png")) {
+            std::cerr << "FAIL";
+        }
+        textures.push_back(image);
         if (!image.loadFromFile("resources/icons/HUD.png")) {
             std::cerr << "FAIL";
         }
@@ -96,14 +100,14 @@ sf::Texture& Settings::getTexture(TextureType type) {
 }
 
 Button::Button(float x, float y, float scale, ButtonType type) :
-    location(x, y, 32 * scale, 32 * scale){
+    location(x ,y ,32 * scale ,32 * scale ){
     this->type = type;
     ishovered = false;
 }
 void Button::update(const sf::Vector2i& mousePos) {
     ishovered = location.contains(sf::Vector2f(mousePos.x,mousePos.y));
 }
-bool Button::isClicked(const sf::Event& event) const {
+bool Button::isClicked(const sf::Event& event){
     return ishovered && event.type == sf::Event::MouseButtonPressed
         && event.mouseButton.button == sf::Mouse::Left;
 }
@@ -159,6 +163,33 @@ sf::Vector2f Slider::getPosition(int index) {
 }
 sf::Vector2f Slider::getScale(int index) {
     return sf::Vector2f(locations[index].width / 16.f, locations[index].height / 16.f);
+}
+
+ToggleButton::ToggleButton(float x, float y, float scale, bool state):
+    location(x ,y ,24 * scale ,16 * scale ){
+    this->state = state;
+    ishovered = false;
+}
+
+void ToggleButton::Clicked(const sf::Event& event) {
+    Settings::setDelay(Settings::getmaxFPS() / 6);
+    if (ishovered && event.type == sf::Event::MouseButtonPressed
+        && event.mouseButton.button == sf::Mouse::Left)state = !state;
+}
+void ToggleButton::update(const sf::Vector2i& mousePos) {
+    ishovered = location.contains(sf::Vector2f(mousePos.x, mousePos.y));
+}
+bool ToggleButton::isHovered() {
+    return ishovered;
+}
+sf::Vector2f ToggleButton::getPosition() {
+    return sf::Vector2f(location.left, location.top);
+}
+sf::Vector2f ToggleButton::getScale() {
+    return sf::Vector2f(location.width / 32.f, location.height / 32.f);
+}
+bool ToggleButton::isON() {
+    return state;
 }
 
 Vector::Vector():value(0, 0) {}

@@ -7,8 +7,8 @@
 
 #define TILE_SIZE 16
 
-enum TextureType {EMPTY,TITLE,BUTTONS,SLIDER, HUD, TILES, ITEMS ,PLAYER,BACKGROUND};
-enum ButtonType {PLAY,OPTIONS,EXIT,DISPLAY,SOUND,CONTROLS};
+enum TextureType {EMPTY,TITLE,BUTTONS,SLIDER,TOGGLEBUTTONS, HUD, TILES, ITEMS ,PLAYER,BACKGROUND};
+enum ButtonType {PLAY,OPTIONS,EXIT,DISPLAY,SOUND,CONTROLS,DEBUG};
 
 class Settings {
     sf::Image icon;
@@ -38,7 +38,7 @@ private:
 public:
     Button(float x, float y, float scale, ButtonType type);
     void update(const sf::Vector2i& mousePos);
-    bool isClicked(const sf::Event& event) const;
+    bool isClicked(const sf::Event& event);
     ButtonType getType();
     bool isHovered();
     sf::Vector2f getPosition();
@@ -57,6 +57,19 @@ public:
     int getSelected();
     sf::Vector2f getPosition(int index);
     sf::Vector2f getScale(int index);
+};
+class ToggleButton {
+    sf::FloatRect location;
+    bool state;
+    bool ishovered;
+public:
+    ToggleButton(float x, float y, float scale, bool state);
+    void update(const sf::Vector2i& mousePos);
+    void Clicked(const sf::Event& event);
+    bool isHovered();
+    sf::Vector2f getPosition();
+    sf::Vector2f getScale();
+    bool isON();
 };
 
 struct Vector {

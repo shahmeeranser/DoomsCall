@@ -8,8 +8,12 @@ class Animater {
     static sf::Sprite player;
     static int playerx;
     static int playery;
+    static sf::Sprite buttonsprite;
+    static sf::Sprite togglebuttonsprite;
 public:
     Animater();
+    static sf::Sprite& HandleButtonAnimation(Button& button);
+    static sf::Sprite& HandleToggleButtonAnimation(ToggleButton& button);
     static sf::Sprite& HandlePlayerAnimation(Player& player);
 };
 
@@ -20,7 +24,6 @@ class Renderer {
     static sf::Sprite items;
     static std::vector<sf::IntRect> tilesrect;
     static sf::Sprite tiles;
-    static sf::Sprite buttonsprite;
     static sf::Sprite slidersprite;
     static sf::Sprite background;
     static sf::Text text;
@@ -31,6 +34,7 @@ public:
     static void RenderMap(sf::RenderWindow& window, Player& player, Map& map);
     static void RenderButton(sf::RenderWindow& window, Button& button);
     static void RenderSlider(sf::RenderWindow& window, Slider& slider);
+    static void RenderToggleButton(sf::RenderWindow& window, ToggleButton& button);
     static void RenderBackground(sf::RenderWindow& window);
     static void RenderPlayer(sf::RenderWindow& window,Player& player);
     static void RenderDropsPile(sf::RenderWindow& window, std::vector<ItemDrop>& pile);
@@ -64,6 +68,7 @@ class SettingsScreen:public Screen {
     Button display;
     Button sound;
     Button controls;
+    Button debug;
     Button exit;
 public:
     SettingsScreen();
@@ -79,7 +84,7 @@ public:
     void update(float deltatime);
     void render(sf::RenderWindow& window);
 };
-class SoundSettingsScreen :public Screen {
+class SoundSettingsScreen:public Screen {
     Slider master;
     Slider effect;
     Slider music;
@@ -87,6 +92,15 @@ class SoundSettingsScreen :public Screen {
     Button exit;
 public:
     SoundSettingsScreen();
+    void input(sf::RenderWindow& window, sf::Event& event);
+    void update(float deltatime);
+    void render(sf::RenderWindow& window);
+};
+class DebugSettingsScreen:public Screen {
+    ToggleButton showFPS;
+    Button exit;
+public:
+    DebugSettingsScreen();
     void input(sf::RenderWindow& window, sf::Event& event);
     void update(float deltatime);
     void render(sf::RenderWindow& window);
