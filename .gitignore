@@ -375,12 +375,7 @@ FodyWeavers.xsd
 # This is where all your build files go on Linux/VS Code
 build/
 
-# 2. CMake Generated Files (If built outside build folder)
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-Makefile
-*.cmake
+
 
 # 3. VS Code Settings (Your personal settings)
 .vscode/
