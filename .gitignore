@@ -384,9 +384,5 @@ build/
 *.o
 *.a
 *.so
-
-# 5. The Linux Executable (No .exe extension)
-DoomsCall
-
 # 6. Static Libraries Folder (Don't upload external libs)
 lib/
