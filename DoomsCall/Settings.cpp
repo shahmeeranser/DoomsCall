@@ -8,13 +8,13 @@ std::vector<sf::Texture> Settings::textures;
 sf::Font Settings::font;
 
 Settings::Settings() {
-    if (!icon.loadFromFile("DoomsCall.ico")) {
-        std::cerr << "FAIL";
-    }
+     if (!icon.loadFromFile("resources/DoomsCall.ico")) {
+          std::cerr << "FAIL";
+     }
     length = 0;
     width = 0;
     maxFPS = 120;
-    std::ifstream fin("Option.txt");
+    std::ifstream fin("resources/option.txt");
     if (!fin) {
         std::cout << "Fail";
         return;
