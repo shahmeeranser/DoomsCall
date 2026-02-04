@@ -8,7 +8,7 @@ std::vector<sf::Texture> Settings::textures;
 sf::Font Settings::font;
 
 Settings::Settings() {
-     if (!icon.loadFromFile("resources/DoomsCall.ico")) {
+     if (!icon.loadFromFile("resources/no_texture.png")) {
           std::cerr << "FAIL";
      }
     length = 0;
@@ -16,7 +16,7 @@ Settings::Settings() {
     maxFPS = 120;
     std::ifstream fin("resources/option.txt");
     if (!fin) {
-        std::cout << "Fail";
+        std::cerr << "Fail";
         return;
     }
     fin >> length;
@@ -38,7 +38,7 @@ Settings::Settings() {
             std::cerr << "FAIL";
         }
         textures.push_back(image);
-        if (!image.loadFromFile("resources/icons/Sliders.png")) {
+        if (!image.loadFromFile("resources/icons/sliders.png")) {
             std::cerr << "FAIL";
         }
         textures.push_back(image);
